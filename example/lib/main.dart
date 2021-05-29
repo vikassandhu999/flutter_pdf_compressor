@@ -39,29 +39,31 @@ class _MyAppState extends State<MyApp> {
 
   Future<String> getTempPath() async {
     var dir = await getExternalStorageDirectory();
-    await new Directory('${dir.path}/CompressPdfs').create(recursive: true);
+    await new Directory('${dir!.path}/CompressPdfs').create(recursive: true);
 
     String randomString = getRandomString(10);
     String pdfFileName = '$randomString.pdf';
     return '${dir.path}/CompressPdfs/$pdfFileName';
   }
 
-  Future<void> openFilePicker() async {
-    String inputPath = await FlutterDocumentPicker.openDocument();
+  Future<String?> openFilePicker() async {
+    String? inputPath = await FlutterDocumentPicker.openDocument();
 
-    if (inputPath == null) return;
+    if (inputPath == null) return 'inputPath is null';
 
     String outputPath = await getTempPath();
     _setLoading(true);
     try {
       await PdfCompressor.compressPdfFile(
           inputPath, outputPath, CompressQuality.LOW);
+      return outputPath;
     } catch (e) {
       print(e);
+      return 'Error';
     }
-    _setLoading(false);
   }
 
+  String? result;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -74,9 +76,21 @@ class _MyAppState extends State<MyApp> {
                   child: CircularProgressIndicator(),
                 )
               : Center(
-                  child: FlatButton(
-                  child: Text("Click here"),
-                  onPressed: () => {openFilePicker()},
+                  child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      child: Text("Pick pdf"),
+                      onPressed: () async {
+                        result = await openFilePicker().whenComplete(() {
+                          _setLoading(false);
+                        });
+                        setState(() {});
+                      },
+                    ),
+                    Text('Result: $result'),
+                  ],
                 ))),
     );
   }
