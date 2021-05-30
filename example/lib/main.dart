@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
     _setLoading(true);
     try {
       await PdfCompressor.compressPdfFile(
-          inputPath, outputPath, CompressQuality.LOW);
+          inputPath, outputPath, CompressQuality.MEDIUM);
       return outputPath;
     } catch (e) {
       print(e);

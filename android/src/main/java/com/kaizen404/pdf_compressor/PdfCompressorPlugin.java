@@ -3,6 +3,7 @@ package com.kaizen404.pdf_compressor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import androidx.annotation.NonNull;
 import com.itextpdf.text.pdf.PRStream;
@@ -140,11 +141,10 @@ public class PdfCompressorPlugin implements FlutterPlugin, MethodCallHandler {
       byte[] imageAsBytes = new PdfImageObject(pRStream).getImageAsBytes();
       ByteArrayOutputStream outputImageStream = new ByteArrayOutputStream();
 
-      compressImage(imageAsBytes, quality, outputImageStream);
+      Bitmap resultBitmap = compressImage(imageAsBytes, quality, outputImageStream);
 
-      if (!outputImageBitmap.isRecycled()) {
-        outputImageBitmap.recycle();
-      }
+      int width = resultBitmap.getWidth();
+      int height = resultBitmap.getHeight();
 
       resetPRStreamForImage(pRStream, outputImageStream.toByteArray(), width, height);
       outputImageStream.close();
@@ -178,7 +178,7 @@ public class PdfCompressorPlugin implements FlutterPlugin, MethodCallHandler {
      * @param outputImageStream
      * @throws Exception
      */
-    private void compressImage(byte[] imageAsBytes, int quality, ByteArrayOutputStream outputImageStream)
+    private Bitmap compressImage(byte[] imageAsBytes, int quality, ByteArrayOutputStream outputImageStream)
         throws Exception {
       Bitmap scaledBitmap = null;
 
@@ -251,6 +251,7 @@ public class PdfCompressorPlugin implements FlutterPlugin, MethodCallHandler {
       //     true);
 
       scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputImageStream);
+      return scaledBitmap;
     }
 
     private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
