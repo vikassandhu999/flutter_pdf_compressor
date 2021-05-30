@@ -1,7 +1,6 @@
 name: pdf_compressor
-description: A new flutter plugin project.
+description: A plugin to compress pdf files locally works for android only.
 version: 0.0.1
-author: Vikas
 homepage: https://github.com/vikassandhu999/flutter_pdf_compressor.git
 
 environment:
